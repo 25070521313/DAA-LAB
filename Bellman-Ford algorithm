@@ -1,0 +1,79 @@
+#include <stdio.h>
+#define MAX 1000
+#define INFINITY 999999999
+int V, E;
+int edges[MAX][3];
+void bellmanFord(int src) {
+    int dist[MAX + 1];
+    int parent[MAX + 1];
+    int i, j;
+    for (i = 1; i <= V; i++) {
+        dist[i] = INFINITY;
+        parent[i] = -1;
+    }
+    dist[src] = 0;    for (i = 1; i <= V - 1; i++) {
+        int changed = 0;
+        for (j = 0; j < E; j++) {
+            int u = edges[j][0];
+            int v = edges[j][1];
+            int w = edges[j][2];
+            if (dist[u] != INFINITY &&
+                dist[u] + w < dist[v]) {
+                dist[v] = dist[u] + w;
+                parent[v] = u;
+                changed = 1;
+            }
+		}
+        if (!changed)
+            break;
+	}
+    for (j = 0; j < E; j++) {
+        int u = edges[j][0];
+        int v = edges[j][1];
+        int w = edges[j][2];
+        if (dist[u] != INFINITY &&
+            dist[u] + w < dist[v]) {
+            printf("Negative cycle detected\n");
+            return;
+        }
+	}
+    for (i = 1; i <= V; i++) {
+        int path[MAX + 1];
+        int count = 0;
+        int current;
+        if (i == src)
+            continue;
+        if (dist[i] == INFINITY) {
+            printf("%d INF None\n", i);
+            continue;
+		}
+        current = i;
+        while (current != -1) {
+            path[count++] = current;
+            current = parent[current];
+		}
+        printf("%d %d ", i, dist[i]);
+        for (j = count - 1; j >= 0; j--) {
+            printf("%d", path[j]);
+            if (j > 0)
+                printf("->");
+		}
+        printf("\n");
+    }
+}
+int main() {
+    int i;
+    int u, v, w;
+    int src;
+    scanf("%d", &V);
+    scanf("%d", &E);
+    for (i = 0; i < E; i++) {
+        scanf("%d %d %d", &u, &v, &w);
+        edges[i][0] = u;
+        edges[i][1] = v;
+        edges[i][2] = w;
+	}
+    scanf("%d", &src);
+    bellmanFord(src);
+    return 0;
+}
